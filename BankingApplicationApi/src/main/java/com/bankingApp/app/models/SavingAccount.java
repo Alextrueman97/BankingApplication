@@ -25,10 +25,6 @@ import lombok.Setter;
 	@AttributeOverride(name = "balance", column = @Column(name = "balance")),
 	@AttributeOverride(name = "dateOpened", column = @Column(name = "date_opened")),
 })
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 public class SavingAccount extends BankAccount {
 
 	@Id
@@ -37,4 +33,35 @@ public class SavingAccount extends BankAccount {
 	private String accountNumber = "SAV" + String.format("%07d", new Random().nextInt(10000000));
 	@OneToMany(mappedBy = "savingAccountNumber")
 	private List <Transactions> transactions;
+	
+	public SavingAccount(String accountNumber, List<Transactions> transactions) {
+		super();
+		this.accountNumber = accountNumber;
+		this.transactions = transactions;
+	}
+
+	public SavingAccount(String accountNumber) {
+		super();
+		this.accountNumber = accountNumber;
+	}
+
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+
+	public List<Transactions> getTransactions() {
+		return transactions;
+	}
+
+	public void setTransactions(List<Transactions> transactions) {
+		this.transactions = transactions;
+	}
+	
+	
+	
+	
 }

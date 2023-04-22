@@ -2,7 +2,10 @@ package com.bankingApp.app.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bankingApp.app.models.UserAccount;
 import com.bankingApp.app.service.UserAccountService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/userAccount")
@@ -40,4 +46,32 @@ public class UserAccountController {
             return ResponseEntity.badRequest().body("Account Not Created Please try again!");
         }
 	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<String> login(
+			@RequestParam("username")String username,
+			@RequestParam("password")String password,
+			HttpServletRequest request, Model model){
+		UserAccount user = this.userAccountService.login(username, password);
+		if(user != null) {
+			HttpSession session = request.getSession(true);
+			session.setAttribute("user", user);
+			return ResponseEntity.ok().body("user logged in");
+		}
+		else {
+			return ResponseEntity.badRequest().body("Username or password incorrect! Please try again!");
+		}
+		
+	}
+	
+	@GetMapping("/account")
+	public ResponseEntity<UserAccount> acountinformation(HttpSession session) {
+		UserAccount user = (UserAccount) session.getAttribute("user");
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}else {
+			return ResponseEntity.ok(user);
+		}
+	}
+
 }
