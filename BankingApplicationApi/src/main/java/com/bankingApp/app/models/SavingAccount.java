@@ -1,5 +1,6 @@
 package com.bankingApp.app.models;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 
@@ -10,6 +11,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,18 +34,24 @@ public class SavingAccount extends BankAccount {
 	@Column(name = "savingAccountNumber")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String accountNumber = "SAV" + String.format("%07d", new Random().nextInt(10000000));
+	@ManyToOne
+	@JoinColumn(name ="accountId")
+	private UserAccount accountId;
 	@OneToMany(mappedBy = "savingAccountNumber")
 	private List <Transactions> transactions;
 	
-	public SavingAccount(String accountNumber, List<Transactions> transactions) {
+	public SavingAccount() {
+		super();
+	}
+	
+	public SavingAccount(String accountNumber) {
 		super();
 		this.accountNumber = accountNumber;
 		this.transactions = transactions;
 	}
 
-	public SavingAccount(String accountNumber) {
-		super();
-		this.accountNumber = accountNumber;
+	public SavingAccount(double balance, LocalDate date) {
+		super(balance, date);
 	}
 
 	public String getAccountNumber() {
@@ -60,7 +69,15 @@ public class SavingAccount extends BankAccount {
 	public void setTransactions(List<Transactions> transactions) {
 		this.transactions = transactions;
 	}
-	
+
+	public UserAccount getAccountId() {
+		return accountId;
+	}
+
+	public void setAccountId(UserAccount accountId) {
+		this.accountId = accountId;
+	}
+
 	
 	
 	

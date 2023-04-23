@@ -23,6 +23,8 @@ public class UserAccountController {
 
 	@Autowired
 	private UserAccountService userAccountService;
+	@Autowired
+	private HttpServletRequest request;
 	
 	@PostMapping("/register")
 	public ResponseEntity<String> registerAccount(
@@ -48,26 +50,29 @@ public class UserAccountController {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<String> login(
+	public ResponseEntity<UserAccount> login(
 			@RequestParam("username")String username,
 			@RequestParam("password")String password,
-			HttpServletRequest request, Model model){
+			HttpServletRequest request){
 		UserAccount user = this.userAccountService.login(username, password);
 		if(user != null) {
 			HttpSession session = request.getSession(true);
 			session.setAttribute("user", user);
-			return ResponseEntity.ok().body("user logged in");
+			return ResponseEntity.ok().body(user);
 		}
 		else {
-			return ResponseEntity.badRequest().body("Username or password incorrect! Please try again!");
+			return ResponseEntity.badRequest().body(null);
 		}
-		
 	}
 	
 	@GetMapping("/account")
-	public ResponseEntity<UserAccount> acountinformation(HttpSession session) {
+	public ResponseEntity<UserAccount> acountinformation() {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
 		UserAccount user = (UserAccount) session.getAttribute("user");
-		if (user == null) {
+		if(user == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}else {
 			return ResponseEntity.ok(user);

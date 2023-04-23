@@ -27,6 +27,10 @@ public class UserAccount {
 	private String lastName;
 	@OneToMany(mappedBy = "accountId")
 	private List<Transactions> transactions;
+	@OneToMany(mappedBy = "accountId")
+	private List<CurrentAccount> currentAccounts;
+	@OneToMany(mappedBy = "accountId")
+	private List<SavingAccount> savingAccounts;
 	
 	public UserAccount() {
 		super();
