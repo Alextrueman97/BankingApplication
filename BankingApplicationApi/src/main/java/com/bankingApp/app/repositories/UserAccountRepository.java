@@ -13,4 +13,5 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Intege
 	@Query(value = "select new UserAccount (ua.accountId, ua.username, ua.email, ua.password, ua.firstName, ua.lastName) from UserAccount ua where ua.username = :username and ua.password = :password")
 	public UserAccount login (@Param("username") String username, @Param("password") String password);
 	
+
 }
