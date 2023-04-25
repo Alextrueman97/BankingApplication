@@ -3,7 +3,7 @@ package com.bankingApp.app.models;
 public enum TransactionType {
 
 	DEPOSIT,
-	WITHDRAW,
+	WITHDRAWAL,
 	OPENING_BALANCE,
 	REVERSAL;
 }

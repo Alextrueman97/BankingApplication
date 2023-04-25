@@ -78,6 +78,65 @@ public class CurrentAccountConrtoller {
 			}
 	}
 	
-	@PostMapping("/currentAccountDeposit")
-	public ResponseEntity<?>
+	@PostMapping("/deposit")
+	public ResponseEntity<?> deposit(@RequestParam("amount") double amount){
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		UserAccount user = (UserAccount) session.getAttribute("user");
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		List<CurrentAccount> currentAccounts = currentAccountService.getCurrentAccountByUser(user);
+		if(currentAccounts.size() > 0) {
+			CurrentAccount currentAccount = currentAccounts.get(0);
+			CurrentAccount updatedAccount = currentAccountService.deposit(currentAccount, amount);
+				if (updatedAccount != null) {
+					//add deposit transaction to the transactions table
+					Transactions depositTransaction = new Transactions(user, currentAccount, null, TransactionType.DEPOSIT, amount, LocalDate.now());
+					transactionsService.saveTransaction(depositTransaction);
+					//return response with updated balance and deposit amount
+					return ResponseEntity.ok().body("Deposited: " + amount + " New Balance: " + updatedAccount.getBalance());
+				} else {
+					return ResponseEntity.badRequest().body("Error depositing amount. Please try again.");				}
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	} 
+	
+	public ResponseEntity<String> withdraw(double amount) {
+	    HttpSession session = request.getSession(false);
+	    if (session == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+
+	    UserAccount user = (UserAccount) session.getAttribute("user");
+	    if (user == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+
+	    List<CurrentAccount> currentAccounts = currentAccountService.getCurrentAccountByUser(user);
+	    if (currentAccounts.size() == 0) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    CurrentAccount currentAccount = currentAccounts.get(0);
+
+	    if (currentAccount.getBalance() - amount < currentAccount.getOverdraftAmount()) {
+	    	Transactions reversalTransaction = new Transactions(user, currentAccount, null, TransactionType.REVERSAL, amount, LocalDate.now());
+	        transactionsService.saveTransaction(reversalTransaction);
+	        return ResponseEntity.badRequest().body("Withdrawal amount exceeds overdraft limit.");
+	    }
+
+	    double newBalance = currentAccount.getBalance() - amount;
+	    currentAccount.setBalance(newBalance);
+
+	    // Adding to transactions table
+	    Transactions withdrawalTransaction = new Transactions(user, currentAccount, null, TransactionType.WITHDRAWAL, amount, LocalDate.now());
+	    transactionsService.saveTransaction(withdrawalTransaction);
+
+	    String message = String.format("Withdrawal of %.2f successful. New balance: %.2f", amount, newBalance);
+	    return ResponseEntity.ok(message);
+	}
 }

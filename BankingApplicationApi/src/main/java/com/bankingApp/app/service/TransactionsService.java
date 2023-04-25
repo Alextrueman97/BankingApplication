@@ -1,6 +1,7 @@
 package com.bankingApp.app.service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,9 @@ public class TransactionsService {
 		transactionsRepository.save(transaction);
 	}
 	
+	public List<Transactions> getTransactionHistoryForCurrentAccount(CurrentAccount currentAccount) {
+	    return transactionsRepository.findByCurrentAccountNumber(currentAccount);
+	}
 	
 	
 }

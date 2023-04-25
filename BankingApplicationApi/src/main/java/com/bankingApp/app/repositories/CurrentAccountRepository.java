@@ -16,8 +16,12 @@ public interface CurrentAccountRepository extends JpaRepository<CurrentAccount, 
 
 	public List<CurrentAccount> findByAccountId(UserAccount userAccount);
 	
-	@Query(value = "update CurrentAccount ca set balance where ca.currenAccountNumber = currentAccountNumber and ca.balance = balance")
-	public CurrentAccount transaction(@Param("currentAccountNumber") CurrentAccount currentAccountNumber, @Param("balance") double balance);
+	@Modifying
+	@Query("UPDATE CurrentAccount ca SET ca.balance = ca.balance + :amount WHERE ca.currentAccountNumber = :currentAccountNumber")
+	public CurrentAccount deposit(@Param("currentAccountNumber") CurrentAccount currentAccountNumber, @Param("balance") double amount);
 	
+	@Modifying
+	@Query("UPDATE CurrentAccount ca SET ca.balance = ca.balance - :amount WHERE ca.currentAccountNumber = :currentAccountNumber")
+	public CurrentAccount withdraw(@Param("currentAccountNumber") CurrentAccount currentAccountNumber, @Param("amount") double amount);
 
 }

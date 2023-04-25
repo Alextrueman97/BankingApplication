@@ -27,7 +27,11 @@ public class CurrentAccountService {
 		return currentAccountRepository.save(currentAccount);
 	}
 	
-	public CurrentAccount depositCurrentAccount(CurrentAccount currentAccountNumber, double balance) {
-		return currentAccountRepository.transaction(currentAccountNumber, balance);
+	public CurrentAccount deposit(CurrentAccount currentAccountNumber, double amount) {
+		return currentAccountRepository.deposit(currentAccountNumber, amount);
+	}
+	
+	public CurrentAccount withdraw(CurrentAccount currentAccountNumber, double amount) {
+	    return currentAccountRepository.withdraw(currentAccountNumber, amount);
 	}
 }
