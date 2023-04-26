@@ -5,8 +5,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +21,7 @@ import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/userAccount")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserAccountController {
 
 	@Autowired
@@ -27,20 +30,11 @@ public class UserAccountController {
 	private HttpServletRequest request;
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> registerAccount(
-			 @RequestParam("username") String username,
-	            @RequestParam("email") String email,
-	            @RequestParam("password") String password,
-	            @RequestParam("confirmPassword") String confirmPassword,
-	            @RequestParam("firstName") String firstName,
-	            @RequestParam("lastName") String lastName) {
-		if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
+	public ResponseEntity<String> registerAccount(@RequestBody UserAccount userAccount) {
+		if (userAccount.getUsername().isEmpty() || userAccount.getEmail().isEmpty() || userAccount.getPassword().isEmpty() ||  userAccount.getFirstName().isEmpty() || userAccount.getLastName().isEmpty()) {
             return ResponseEntity.badRequest().body("All fields are required");
         }
-		if (!password.equals(confirmPassword)) {
-            return ResponseEntity.badRequest().body("Passwords do not match");
-        }
-		UserAccount ua = new UserAccount(username, email, password, firstName, lastName);
+		UserAccount ua = new UserAccount(userAccount.getUsername(), userAccount.getEmail(), userAccount.getPassword(), userAccount.getFirstName(), userAccount.getLastName());
         try {
             UserAccount savedInfo = userAccountService.register(ua);
             return ResponseEntity.ok().body("Registration successful");
