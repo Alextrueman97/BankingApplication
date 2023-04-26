@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bankingApp.app.models.CurrentAccount;
+import com.bankingApp.app.models.SavingAccount;
 import com.bankingApp.app.models.TransactionType;
 import com.bankingApp.app.models.Transactions;
 import com.bankingApp.app.repositories.CurrentAccountRepository;
@@ -37,5 +38,9 @@ public class TransactionsService {
 	    return transactionsRepository.findByCurrentAccountNumber(currentAccount);
 	}
 	
+	
+	public List<Transactions> getTransactionHistoryForSavingAcocunt(SavingAccount savingAccount){
+		return transactionsRepository.findBySavingAccountNumber(savingAccount);
+	}
 	
 }

@@ -8,12 +8,15 @@ import org.springframework.stereotype.Service;
 import com.bankingApp.app.models.CurrentAccount;
 import com.bankingApp.app.models.UserAccount;
 import com.bankingApp.app.repositories.CurrentAccountRepository;
+import com.bankingApp.app.repositories.TransactionsRepository;
 
 @Service
 public class CurrentAccountService {
 
 	@Autowired
 	private CurrentAccountRepository currentAccountRepository;
+	@Autowired
+	private TransactionsRepository transactionsRepository;
 	
 	public CurrentAccount createNewCurrentAccount(CurrentAccount currentAccount) {
 		return currentAccountRepository.save(currentAccount);
@@ -27,11 +30,22 @@ public class CurrentAccountService {
 		return currentAccountRepository.save(currentAccount);
 	}
 	
-	public CurrentAccount deposit(CurrentAccount currentAccountNumber, double amount) {
-		return currentAccountRepository.deposit(currentAccountNumber, amount);
+	public CurrentAccount deposit(CurrentAccount currentAccount, double amount) {
+        double newBalance = currentAccount.getBalance() + amount;
+        currentAccount.setBalance(newBalance);
+        return currentAccountRepository.save(currentAccount);
 	}
 	
-	public CurrentAccount withdraw(CurrentAccount currentAccountNumber, double amount) {
-	    return currentAccountRepository.withdraw(currentAccountNumber, amount);
+	public CurrentAccount withdraw(CurrentAccount currentAccount, double amount) {
+	    double currentBalance = currentAccount.getBalance();
+	    double overdraftAmount = currentAccount.getOverdraftAmount();
+	    if ((currentBalance - amount) < -overdraftAmount) {
+	        return null;
+	    } else {
+	        double newBalance = currentBalance - amount;
+	        currentAccount.setBalance(newBalance);
+	        return currentAccountRepository.save(currentAccount);
+	    }
 	}
 }
+
