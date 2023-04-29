@@ -1,5 +1,7 @@
 package com.bankingApp.app.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -44,19 +46,19 @@ public class UserAccountController {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<UserAccount> login(
-			@RequestParam("username")String username,
-			@RequestParam("password")String password,
-			HttpServletRequest request){
-		UserAccount user = this.userAccountService.login(username, password);
-		if(user != null) {
-			HttpSession session = request.getSession(true);
-			session.setAttribute("user", user);
-			return ResponseEntity.ok().body(user);
-		}
-		else {
-			return ResponseEntity.badRequest().body(null);
-		}
+	public ResponseEntity<Boolean> login(@RequestBody Map<String, String> loginRequest,
+	                                      HttpServletRequest request){
+	    String username = loginRequest.get("username");
+	    String password = loginRequest.get("password");
+	    UserAccount user = this.userAccountService.login(username, password);
+	    if(user != null) {
+	        HttpSession session = request.getSession(true);
+	        session.setAttribute("user", user);
+	        return ResponseEntity.ok().body(true); // User is logged in
+	    }
+	    else {
+	        return ResponseEntity.ok().body(false); // User is not logged in
+	    }
 	}
 	
 	@GetMapping("/account")
